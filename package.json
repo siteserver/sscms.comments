@@ -1,0 +1,129 @@
+{
+  "name": "comments",
+  "displayName": "评论插件",
+  "description": "SSCMS 评论插件用于在页面中提交及显示评论",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "publisher": "sscms",
+  "engines": {
+    "sscms": "^7.0.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "内容"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/siteserver/sscms.comments"
+  },
+  "icon": "/assets/comments/logo.svg",
+  "output": "",
+  "main": "SSCMS.Comments.dll",
+  "applyToSites": true,
+  "applyToChannels": true,
+  "extensions": {
+    "permissions": {
+      "comments_manage": {
+        "text": "评论管理",
+        "type": ["web", "wx"]
+      },
+      "comments_settings": {
+        "text": "选项设置",
+        "type": ["web", "wx"]
+      },
+      "comments_templates": {
+        "text": "评论模板",
+        "type": ["web", "wx"]
+      },
+      "comments_channels_config": {
+        "text": "栏目设置",
+        "type": ["web", "wx"]
+      }
+    },
+    "menus": {
+      "comments_site_all": {
+        "text": "评论管理",
+        "iconClass": "ion-android-list",
+        "type": ["web", "wx"],
+        "permissions": [
+          "comments_manage",
+          "comments_settings",
+          "comments_templates",
+          "comments_channels_config"
+        ],
+        "menus": {
+          "comments_manage": {
+            "text": "评论管理",
+            "link": "/ss-admin/comments/manage/",
+            "permissions": ["comments_manage"],
+            "order": 1
+          },
+          "comments_settings": {
+            "text": "选项设置",
+            "link": "/ss-admin/comments/settings/",
+            "permissions": ["comments_settings"],
+            "order": 2
+          },
+          "comments_templates": {
+            "text": "评论模板",
+            "link": "/ss-admin/comments/templates/",
+            "permissions": ["comments_templates"],
+            "order": 3
+          },
+          "comments_channels_config": {
+            "text": "内容评论设置",
+            "link": "/ss-admin/plugins/config/?pluginId=sscms.comments",
+            "permissions": ["comments_channels_config"],
+            "order": 4
+          }
+        }
+      },
+      "comments_contents_all": {
+        "text": "评论",
+        "type": ["content"],
+        "link": "/ss-admin/comments/manage/",
+        "permissions": [
+          "comments_manage"
+        ],
+        "order": 1
+      }
+    },
+    "tables": {
+      "sscms_comments_settings": {
+        "columns": [
+          {
+            "attributeName": "SiteId",
+            "dataType": "Integer"
+          }
+        ]
+      },
+      "sscms_comments": {
+        "columns": [
+          {
+            "attributeName": "SiteId",
+            "dataType": "Integer"
+          },
+          {
+            "attributeName": "ContentId",
+            "dataType": "Integer"
+          },
+          {
+            "attributeName": "UserId",
+            "dataType": "Integer"
+          },
+          {
+            "attributeName": "ParentId",
+            "dataType": "Integer"
+          },
+          {
+            "attributeName": "Content",
+            "dataType": "VarChar",
+            "dataLength": 2000
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+﻿@page
+@{ Layout = "_Layout"; }
+
+<div style="height: 10px;"></div>
+
+<el-form ref="form" :model="form" size="small" label-width="120px">
+  <el-form-item label="评论" prop="content" :rules="{ required: true, message: '请输入评论' }">
+    <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 10}" v-model="form.content"></el-input>
+  </el-form-item>
+</el-form>
+
+<el-divider></el-divider>
+<div style="height: 10px"></div>
+
+<el-row>
+  <el-col :span="24" align="right">
+    <el-button type="primary" v-on:click="btnSubmitClick" size="small">确 定</el-button>
+    <el-button size="small" v-on:click="btnCancelClick">关 闭</el-button>
+  </el-col>
+</el-row>
+
+@section Scripts{
+  <script src="/assets/comments/js/manageLayerEdit.js" type="text/javascript"></script>
+}
