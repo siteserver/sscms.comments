@@ -1,62 +1,122 @@
 ﻿@page
 @{ Layout = "_Layout"; }
 
-<el-row id="commands">
-  <el-col :span="12">
-    <el-button size="mini" plain type="primary" icon="el-icon-download" style="margin-left: 0;" v-on:click="btnExportClick">
-      导 出
-    </el-button>
-  </el-col>
-  <el-col :span="12" align="right">
-  </el-col>
-</el-row>
+<el-container>
+  <el-aside width="100px">
+    <el-tabs v-model="status" tab-position="left" style="height: 100%;" v-on:tab-click="btnSearchClick">
+      <el-tab-pane label="全部" name="All"></el-tab-pane>
+      <el-tab-pane label="待审核" name="Pending"></el-tab-pane>
+      <el-tab-pane label="已审核" name="Approved"></el-tab-pane>
+      <el-tab-pane label="垃圾信息" name="Spam"></el-tab-pane>
+    </el-tabs>
+  </el-aside>
 
-<el-divider></el-divider>
-
-<el-table :data="items" stripe style="width: 100%">
-  <el-table-column
-    label="头像" width="100">
-    <template slot-scope="scope">
-      <el-link :underline="false" v-on:click="btnViewClick(scope.row.userId)">
-        <el-avatar :size="40" :src="scope.row.user.avatarUrl || utils.getAssetsUrl('images/default_avatar.png')"></el-avatar>
-      </el-link>
-    </template>
-  </el-table-column>
-  <el-table-column label="评论人" width="160">
-    <template slot-scope="scope">
-      <el-link :underline="false" type="primary" v-on:click="btnViewClick(scope.row.userId)">{{(scope.row.user.displayName || '匿名用户')}}</el-link>
-    </template>
-  </el-table-column>
-  <el-table-column prop="content" label="评论内容"></el-table-column>
-  <el-table-column label="评论时间" align="center" width="160">
-    <template slot-scope="scope">
-      {{ utils.getFriendlyDate(scope.row.createdDate) }}
-    </template>
-  </el-table-column>
-  <el-table-column
-    fixed="right"
-    label="操作"
-    width="120">
-    <template slot-scope="scope">
-      <el-link :underline="false" v-on:click="btnEditClick(scope.row.id)" type="primary">编辑</el-link>
-      <el-link :underline="false" type="danger" v-on:click="btnDeleteClick(scope.row.id)">删除</el-link>
-    </template>
-  </el-table-column>
-</el-table>
-
-<el-row style="margin-top: 15px;">
-  <el-col :span="24" align="center">
-    <el-pagination
-      size="mini"
-      background
-      v-on:current-change="handleCurrentChange"
-      :current-page="page"
-      :page-size="pageSize"
-      layout="total, prev, pager, next, jumper"
-      :total="total">
-    </el-pagination>
-  </el-col>
-</el-row>
+  <el-container>
+    <el-main>
+      <el-form :inline="true" size="small">
+        <el-form-item>
+          <el-dropdown v-on:command="btnStatusClick">
+            <el-button size="mini" type="primary" style="margin-left: 0;" :disabled="total === 0 || !isCommentChecked">
+              设置状态
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="Approved">已审核</el-dropdown-item>
+              <el-dropdown-item command="Spam">垃圾信息</el-dropdown-item>
+              <el-dropdown-item command="Pending">待审核</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="mini" type="primary" icon="el-icon-download" style="margin-left: 0;" v-on:click="btnExportClick">
+            导 出
+          </el-button>
+        </el-form-item>
+        <el-form-item label="关键词">
+          <el-input
+            v-model="keyword"
+            placeholder="请输入关键词"
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="mini" type="primary" icon="el-icon-search" style="margin-left: 0;" v-on:click="btnSearchClick">
+            搜 索
+          </el-button>
+        </el-form-item>
+      </el-form>
+      
+      <el-divider></el-divider>
+      
+      <el-table
+        ref="multipleTable"
+        row-key="id"
+        :data="items"
+        stripe
+        :row-class-name="tableRowClassName"
+        v-on:selection-change="handleSelectionChange"
+        v-on:row-click="toggleSelection"
+        style="width: 100%">
+        <el-table-column type="selection" width="45" align="center"></el-table-column>
+        <el-table-column
+          label="头像" width="70">
+          <template slot-scope="scope">
+            <el-link :underline="false" v-on:click="btnViewClick(scope.row.userId)">
+              <el-avatar :size="40" :src="scope.row.user.avatarUrl || utils.getAssetsUrl('images/default_avatar.png')"></el-avatar>
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column label="评论人" width="120">
+          <template slot-scope="scope">
+            <el-link :underline="false" type="primary" v-on:click="btnViewClick(scope.row.userId)">{{(scope.row.user.displayName || '匿名用户')}}</el-link>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="channelId === 0" label="评论内容" width="260">
+          <template slot-scope="scope">
+            <el-link v-if="scope.row.contentChecked" type="primary" :underline="false" :href="getContentUrl(scope.row)" target="_blank" v-html="scope.row.contentTitle" v-on:click.stop.native></el-link>
+            <el-link v-else type="primary" :underline="false" v-html="scope.row.contentTitle" v-on:click.stop.native></el-link>
+          </template>
+        </el-table-column>
+        <el-table-column prop="content" label="评论"></el-table-column>
+        <el-table-column label="状态" align="center" width="80">
+          <template slot-scope="scope">
+            <el-link size="mini" :underline="false" v-on:click.stop.native="btnStatusClick(scope.row)" :type="getStatusType(scope.row.status)">
+              {{ getStatus(scope.row.status) }}
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column label="评论时间" align="center" width="160">
+          <template slot-scope="scope">
+            {{ utils.getFriendlyDate(scope.row.createdDate) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          label="操作"
+          width="120">
+          <template slot-scope="scope">
+            <el-link :underline="false" v-on:click="btnEditClick(scope.row)" type="primary">编辑</el-link>
+            <el-link :underline="false" type="danger" v-on:click="btnDeleteClick(scope.row)">删除</el-link>
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <el-row style="margin-top: 15px;">
+        <el-col :span="24" align="center">
+          <el-pagination
+            size="mini"
+            background
+            v-on:current-change="handleCurrentChange"
+            :current-page="page"
+            :page-size="pageSize"
+            layout="total, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
+        </el-col>
+      </el-row>
+      
+    </el-main>
+  </el-container>
+</el-container>
 
 @section Scripts{
   <script src="/assets/comments/js/manage.js" type="text/javascript"></script>

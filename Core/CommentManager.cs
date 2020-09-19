@@ -42,6 +42,8 @@ namespace SSCMS.Comments.Core
                 settings = new Settings
                 {
                     SiteId = siteId,
+                    IsCaptcha = true,
+                    IsApprovedByDefault = false,
                     PageSize = 30,
                 };
                 settings.Id = await _settingsRepository.InsertAsync(settings);

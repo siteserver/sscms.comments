@@ -2,32 +2,34 @@
 using Microsoft.AspNetCore.Mvc;
 using SSCMS.Dto;
 using SSCMS.Comments.Core;
+using SSCMS.Comments.Models;
 
 namespace SSCMS.Comments.Controllers.Admin
 {
     public partial class SettingsController
     {
         [HttpPost, Route(Route)]
-        public async Task<ActionResult<BoolResult>> Submit([FromBody] SubmitRequest request)
+        public async Task<ActionResult<BoolResult>> Submit([FromBody] Settings request)
         {
             if (!await _authManager.HasSitePermissionsAsync(request.SiteId, CommentManager.PermissionsSettings))
                 return Unauthorized();
 
             var settings = await _commentManager.GetSettingsAsync(request.SiteId);
 
-            settings.IsClosed = request.Settings.IsClosed;
-            settings.PageSize = request.Settings.PageSize;
-            settings.IsCaptcha = request.Settings.IsCaptcha;
-            settings.IsAdministratorSmsNotify = request.Settings.IsAdministratorSmsNotify;
-            settings.AdministratorSmsNotifyTplId = request.Settings.AdministratorSmsNotifyTplId;
-            settings.AdministratorSmsNotifyKeys = request.Settings.AdministratorSmsNotifyKeys;
-            settings.AdministratorSmsNotifyMobile = request.Settings.AdministratorSmsNotifyMobile;
-            settings.IsAdministratorMailNotify = request.Settings.IsAdministratorMailNotify;
-            settings.AdministratorMailNotifyAddress = request.Settings.AdministratorMailNotifyAddress;
-            settings.IsUserSmsNotify = request.Settings.IsUserSmsNotify;
-            settings.UserSmsNotifyTplId = request.Settings.UserSmsNotifyTplId;
-            settings.UserSmsNotifyKeys = request.Settings.UserSmsNotifyKeys;
-            settings.UserSmsNotifyMobileName = request.Settings.UserSmsNotifyMobileName;
+            settings.IsSubmitDisabled = request.IsSubmitDisabled;
+            settings.PageSize = request.PageSize;
+            settings.IsCaptcha = request.IsCaptcha;
+            settings.IsApprovedByDefault = request.IsApprovedByDefault;
+            settings.IsAdministratorSmsNotify = request.IsAdministratorSmsNotify;
+            settings.AdministratorSmsNotifyTplId = request.AdministratorSmsNotifyTplId;
+            settings.AdministratorSmsNotifyKeys = request.AdministratorSmsNotifyKeys;
+            settings.AdministratorSmsNotifyMobile = request.AdministratorSmsNotifyMobile;
+            settings.IsAdministratorMailNotify = request.IsAdministratorMailNotify;
+            settings.AdministratorMailNotifyAddress = request.AdministratorMailNotifyAddress;
+            settings.IsUserSmsNotify = request.IsUserSmsNotify;
+            settings.UserSmsNotifyTplId = request.UserSmsNotifyTplId;
+            settings.UserSmsNotifyKeys = request.UserSmsNotifyKeys;
+            settings.UserSmsNotifyMobileName = request.UserSmsNotifyMobileName;
 
             await _settingsRepository.UpdateAsync(settings);
 

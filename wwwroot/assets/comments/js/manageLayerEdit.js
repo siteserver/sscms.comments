@@ -2,6 +2,7 @@
 
 var data = utils.init({
   siteId: utils.getQueryInt('siteId'),
+  channelId: utils.getQueryInt('channelId'),
   contentId: utils.getQueryInt('contentId'),
   commentId: utils.getQueryInt('commentId'),
   form: null
@@ -15,6 +16,7 @@ var methods = {
     $api.get($url, {
       params: {
         siteId: this.siteId,
+        channelId: this.channelId,
         contentId: this.contentId,
         commentId: this.commentId
       }

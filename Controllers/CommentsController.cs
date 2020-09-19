@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using SSCMS.Comments.Abstractions;
+using SSCMS.Comments.Core;
 using SSCMS.Comments.Models;
 using SSCMS.Repositories;
 using SSCMS.Services;
@@ -28,17 +29,16 @@ namespace SSCMS.Comments.Controllers
             public bool IsCaptcha { get; set; }
         }
 
-        public class ListRequest
+        public class ListRequest : CommentRequest
         {
-            public int SiteId { get; set; }
-            public int ContentId { get; set; }
             public int Page { get; set; }
         }
 
         public class GetResult
         {
-            public bool IsClosed { get; set; }
+            public bool IsSubmitDisabled { get; set; }
             public bool IsCaptcha { get; set; }
+            public bool IsApprovedByDefault { get; set; }
             public List<Comment> Items { get; set; }
             public int Total { get; set; }
             public int PageSize { get; set; }

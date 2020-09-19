@@ -13,30 +13,36 @@ namespace SSCMS.Comments.Controllers
         public async Task<ActionResult<SubmitResult>> Submit([FromBody] Comment request)
         {
             var settings = await _commentManager.GetSettingsAsync(request.SiteId);
-            if (settings.IsClosed)
+            if (settings.IsSubmitDisabled)
             {
-                return this.Error("对不起，表单已被禁用");
+                return this.Error("对不起，评论已被禁用");
             }
 
-            request.SiteId = request.SiteId;
-            request.ContentId = request.ContentId;
             request.UserId = _authManager.UserId;
+            request.Status = settings.IsApprovedByDefault ? CommentStatus.Approved : CommentStatus.Pending;
+            request.IpAddress = PageUtils.GetIpAddress(Request);
 
             request.Id = await _commentRepository.InsertAsync(request);
             _commentManager.SendNotify(request);
 
-            var (total, items) = await _commentRepository.GetCommentsAsync(request.SiteId, request.ContentId, null, 1, settings.PageSize);
-            var list = new List<Comment>();
-            foreach (var item in items)
+            List<Comment> list = null;
+            var total = 0;
+            if (settings.IsApprovedByDefault)
             {
-                var comment = item.Clone<Comment>();
-                var user = new User();
-                if (comment.UserId > 0)
+                List<Comment> items;
+                (total, items) = await _commentRepository.GetCommentsAsync(request.SiteId, request.ChannelId, request.ContentId, CommentStatus.Approved, null, 1, settings.PageSize);
+                list = new List<Comment>();
+                foreach (var item in items)
                 {
-                    user = await _userRepository.GetByUserIdAsync(comment.UserId);
+                    var comment = item.Clone<Comment>();
+                    var user = new User();
+                    if (comment.UserId > 0)
+                    {
+                        user = await _userRepository.GetByUserIdAsync(comment.UserId);
+                    }
+                    comment.Set("user", user);
+                    list.Add(comment);
                 }
-                comment.Set("user", user);
-                list.Add(comment);
             }
 
             return new SubmitResult

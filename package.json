@@ -106,12 +106,24 @@
             "dataType": "Integer"
           },
           {
+            "attributeName": "ChannelId",
+            "dataType": "Integer"
+          },
+          {
             "attributeName": "ContentId",
             "dataType": "Integer"
           },
           {
             "attributeName": "UserId",
             "dataType": "Integer"
+          },
+          {
+            "attributeName": "IpAddress",
+            "dataType": "VarChar"
+          },
+          {
+            "attributeName": "Status",
+            "dataType": "VarChar"
           },
           {
             "attributeName": "ParentId",

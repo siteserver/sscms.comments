@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SSCMS.Configuration;
 using SSCMS.Comments.Abstractions;
-using SSCMS.Comments.Core;
 using SSCMS.Comments.Models;
 using SSCMS.Services;
 
@@ -31,11 +30,6 @@ namespace SSCMS.Comments.Controllers.Admin
             public Settings Settings { get; set; }
             public List<string> AdministratorSmsNotifyKeys { get; set; }
             public List<string> UserSmsNotifyKeys { get; set; }
-        }
-
-        public class SubmitRequest : CommentRequest
-        {
-            public Settings Settings { get; set; }
         }
     }
 }

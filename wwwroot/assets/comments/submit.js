@@ -12,82 +12,92 @@ var $api = axios.create({
 var $url = '/comments';
 
 var data = utils.init({
-  siteId: utils.getQueryInt('siteId') || $formConfigSiteId,
+  siteId: utils.getQueryInt('siteId') || $commentsConfigSiteId,
+  channelId: utils.getQueryInt('channelId') || $commentsConfigChannelId,
+  contentId: utils.getQueryInt('contentId') || $commentsConfigContentId,
   pageType: '',
-  styles: [],
-  title: '',
-  description: '',
+  isSubmitDisabled: false,
+  isApprovedByDefault: false,
   isCaptcha: false,
+  captcha: '',
+  captchaValue: '',
   captchaUrl: null,
-  captchaInValid: false,
-  uploadUrl: null,
-  files: [],
-  form: null,
+  form: {},
+  total: null,
+  pageSize: null,
+  total: null,
+  page: 1,
+  items: [],
+  success: false
 });
 
 var methods = {
-  getUploadUrl: function(style) {
-    return this.uploadUrl + '&fieldId=' + style.id;
-  },
-
-  imageUploaded: function(error, file) {
-    if (!error) {
-      var res = JSON.parse(file.serverId);
-      var style = _.find(this.styles, function(o) { return o.id === res.fieldId; });
-      style.value = res.value;
-    }
-  },
-
-  imageRemoved: function(style) {
-    style.value = [];
-  },
-
-  getForm: function(styles, value) {
-    var form =  _.assign({}, value);
-    for (var i = 0; i < styles.length; i++) {
-      var style = styles[i];
-      var name = _.lowerFirst(style.attributeName);
-      if (style.inputType === 'TextEditor') {
-        setTimeout(function () {
-          var editor = UE.getEditor(style.attributeName, {
-            allowDivTransToP: false,
-            maximumWords: 99999999
-          });
-          editor.attributeName = style.attributeName;
-          editor.ready(function () {
-            editor.addListener("contentChange", function () {
-              $this.form[this.attributeName] = this.getContent();
-            });
-          });
-        }, 100);
-      } else if (style.inputType === 'CheckBox' || style.inputType === 'SelectMultiple') {
-        if (!form[name] || !Array.isArray(form[name])) {
-          form[name] = [];
-        }
-      }
-    }
-    return form;
-  },
-
-  apiGet: function () {
+  apiGet: function (page) {
     var $this = this;
 
     utils.loading(this, true);
-    $api.post($url + '/' + this.siteId + '/actions/getForm').then(function (response) {
+    $api.get($url, {
+      params: {
+        siteId: this.siteId,
+        channelId: this.channelId,
+        contentId: this.contentId,
+        page: page
+      }
+    }).then(function (response) {
       var res = response.data;
 
-      $this.title = res.title;
-      $this.description = res.description;
+      $this.isSubmitDisabled = res.isSubmitDisabled;
+      $this.isApprovedByDefault = res.isApprovedByDefault;
       $this.isCaptcha = res.isCaptcha;
-      $this.styles = res.styles;
-      $this.form = $this.getForm(res.styles, _.assign({
-        captcha: ''
-      }, res.comment));
+      if ($this.isCaptcha) {
+        $this.apiCaptchaLoad();
+      }
+      $this.form = _.assign({
+        siteId: $this.siteId,
+        channelId: $this.channelId,
+        contentId: $this.contentId,
+        captcha: '',
+        content: ''
+      });
       $this.pageType = 'form';
+
+      $this.items = res.items;
+      $this.pageSize = res.pageSize || 30;
+      $this.total = res.total;
     }).catch(function (error) {
       utils.error(error);
     }).then(function () {
       utils.loading($this, false);
+    });
+  },
+
+  apiCaptchaLoad: function () {
+    var $this = this;
+
+    utils.loading(this, true);
+    $api.post('/v1/captcha').then(function (response) {
+      var res = response.data;
+
+      $this.captchaValue = res.value;
+      $this.captchaUrl = $apiUrl + '/v1/captcha/' + res.value;
+    }).catch(function (error) {
+      utils.error(error);
+    }).then(function () {
+      utils.loading($this, false);
+    });
+  },
+
+  apiCaptchaCheck: function () {
+    var $this = this;
+
+    $api.post('/v1/captcha/actions/check', {
+      captcha: this.form.captcha,
+      value: this.captchaValue
+    }).then(function (res) {
+      $this.apiSubmit();
+    })
+    .catch(function (error) {
+      utils.error(error);
     });
   },
 
@@ -95,11 +105,15 @@ var methods = {
     var $this = this;
 
     utils.loading(true);
-    $api.post($url + '/' + this.siteId, _.assign({}, this.form)).then(function (response) {
+    $api.post($url, this.form).then(function (response) {
       var res = response.data;
 
-      $this.pageType = 'success';
+      if ($this.isApprovedByDefault) {
+        $this.items = res.items;
+        $this.total = res.total;
+      }
       
+      $this.success = true;
     }).catch(function (error) {
       utils.error(error);
     }).then(function () {
@@ -107,57 +121,22 @@ var methods = {
     });
   },
 
-  getValue: function (attributeName) {
-    for (var i = 0; i < this.styles.length; i++) {
-      var style = this.styles[i];
-      if (style.attributeName === attributeName) {
-        return style.value;
-      }
-    }
-    return '';
-  },
-
-  setValue: function (attributeName, value) {
-    for (var i = 0; i < this.styles.length; i++) {
-      var style = this.styles[i];
-      if (style.attributeName === attributeName) {
-        style.value = value;
-      }
-    }
-  },
-
-  btnImageClick: function (imageUrl) {
-    top.utils.openImagesLayer([imageUrl]);
-  },
-
   btnSubmitClick: function () {
     var $this = this;
     this.$refs.form.validate(function(valid) {
       if (valid) {
-        $this.apiSubmit();
+        if ($this.isCaptcha) {
+          $this.apiCaptchaCheck();
+        } else {
+          $this.apiSubmit();
+        }
       }
     });
   },
 
-  btnLayerClick: function(options) {
-    var query = {
-      siteId: this.siteId,
-      attributeName: options.attributeName
-    };
-    if (options.no) {
-      query.no = options.no;
-    }
-
-    var args = {
-      title: options.title,
-      url: utils.getCommonUrl(options.name, query)
-    };
-    if (!options.full) {
-      args.width = options.width ? options.width : 700;
-      args.height = options.height ? options.height : 500;
-    }
-    utils.openLayer(args);
-  },
+  handleCurrentChange: function(val) {
+    this.apiGet(val);
+  }
 };
 
 var $vue = new Vue({
@@ -165,6 +144,6 @@ var $vue = new Vue({
   data: data,
   methods: methods,
   created: function () {
-    this.apiGet();
+    this.apiGet(0);
   }
 });

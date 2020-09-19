@@ -9,11 +9,13 @@ namespace SSCMS.Comments.Models
         [DataColumn]
         public int SiteId { get; set; }
 
-        public bool IsClosed { get; set; }
+        public bool IsSubmitDisabled { get; set; }
 
         public bool IsCaptcha { get; set; }
 
         public int PageSize { get; set; } = 30;
+
+        public bool IsApprovedByDefault { get; set; }
 
         //向管理员发送短信通知
         public bool IsAdministratorSmsNotify { get; set; }

@@ -51,12 +51,20 @@ namespace SSCMS.Comments.Core
             await _repository.DeleteAsync(commentId);
         }
 
+        public async Task SetStatusAsync(List<int> commentIds, CommentStatus status)
+        {
+            await _repository.UpdateAsync(Q
+                .Set(nameof(Comment.Status), status.GetValue())
+                .WhereIn(nameof(Comment.Id), commentIds)
+            );
+        }
+
         public async Task<int> GetCountAsync(int siteId)
         {
             return await _repository.CountAsync(Q.Where(nameof(Comment.SiteId), siteId));
         }
 
-        public async Task<(int Total, List<Comment>)> GetCommentsAsync(int siteId, int contentId, string word, int page, int pageSize)
+        public async Task<(int Total, List<Comment>)> GetCommentsAsync(int siteId, int channelId, int contentId, CommentStatus status, string keyword, int page, int pageSize)
         {
             if (page == 0) page = 1;
 
@@ -65,17 +73,27 @@ namespace SSCMS.Comments.Core
                 .OrderByDesc(nameof(Comment.Id))
                 .ForPage(page, pageSize);
 
+            if (channelId > 0)
+            {
+                q.Where(nameof(Comment.ChannelId), channelId);
+            }
             if (contentId > 0)
             {
                 q.Where(nameof(Comment.ContentId), contentId);
             }
 
-            if (!string.IsNullOrEmpty(word))
+            if (status != CommentStatus.All)
             {
-                q.Where(query => query
-                    .WhereLike(nameof(Comment.Content), $"%{word}%")
-                    .OrWhereLike(ExtendValues, $"%{word}%")
-                );
+                q.Where(nameof(Comment.Status), status.GetValue());
+            }
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                q.WhereLike(nameof(Comment.Content), $"%{keyword}%");
+                //q.Where(query => query
+                //    .WhereLike(nameof(Comment.Content), $"%{keyword}%")
+                //    .OrWhereLike(ExtendValues, $"%{keyword}%")
+                //);
             }
 
             var count = await _repository.CountAsync(q);
@@ -84,12 +102,20 @@ namespace SSCMS.Comments.Core
             return (count, list);
         }
 
-        public async Task<List<Comment>> GetCommentsAsync(int siteId, int contentId)
+        public async Task<List<Comment>> GetCommentsAsync(int siteId, int channelId, int contentId)
         {
             var q = Q
                 .Where(nameof(Comment.SiteId), siteId)
-                .Where(nameof(Comment.ContentId), contentId)
                 .OrderByDesc(nameof(Comment.Id));
+
+            if (channelId > 0)
+            {
+                q.Where(nameof(Comment.ChannelId), channelId);
+            }
+            if (contentId > 0)
+            {
+                q.Where(nameof(Comment.ContentId), contentId);
+            }
 
             return await _repository.GetAllAsync(q);
         }

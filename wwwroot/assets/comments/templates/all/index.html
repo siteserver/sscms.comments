@@ -52,38 +52,54 @@
         </el-col>
       </el-row>
 
-      <el-alert
-        v-if="success"
-        style="margin-top: 20px; padding: 10px"
-        title="评论提交成功！"
-        :closable="false"
-        type="success"
-        center
-        show-icon>
-      </el-alert>
-      <div v-else>
-        <el-form size="medium" ref="form" :model="form" label-width="80px" style="margin-top: 15px;">
+      <div v-if="!isSubmitDisabled">
+        <el-alert
+          v-if="success && isApprovedByDefault"
+          style="margin-top: 20px; padding: 10px"
+          title="评论提交成功！"
+          :closable="false"
+          type="success"
+          center
+          show-icon>
+        </el-alert>
+        <el-alert
+          v-else-if="success && !isApprovedByDefault"
+          style="margin-top: 20px; padding: 10px"
+          title="评论提交成功，等待管理员审核！"
+          :closable="false"
+          type="success"
+          center
+          show-icon>
+        </el-alert>
+        <div v-else>
+          <el-form size="medium" ref="form" :model="form" label-width="80px" style="margin-top: 15px;">
+  
+            <el-form-item label="评论" prop="content" :rules="{ required: true, message: '请输入评论' }">
+              <el-input
+                v-model="form.content"
+                type="textarea"
+                :autosize="{ minRows: 4, maxRows: 10}">
+              </el-input>
+            </el-form-item>
 
-          <el-form-item label="评论" prop="content" :rules="{ required: true, message: '请输入评论' }">
-            <el-input
-              v-model="form.content"
-              type="textarea"
-              :autosize="{ minRows: 4, maxRows: 10}">
-            </el-input>
-          </el-form-item>
-  
-          <el-form-item v-if="isCaptcha" label="验证码" prop="captcha" :rules="{ required: true, message: '请输入验证码' }">
-            <el-input v-model="form.captcha" placeholder="请输入验证码"></el-input>
-          </el-form-item>
-          
-        </el-form>
-  
-        <el-row style="text-align: center;">
-          <el-divider></el-divider>
-          <div style="height: 10px"></div>
-          <el-button type="primary" size="medium" v-on:click="btnSubmitClick">提 交</el-button>
-          <div style="height: 10px"></div>
-        </el-row>
+            <el-form-item v-if="isCaptcha" label="验证码" prop="captcha" :rules="{ required: true, message: '请输入验证码' }">
+              <el-col :span="6">
+                <el-input v-model="form.captcha" placeholder="请输入验证码"></el-input>
+              </el-col>
+              <el-col :span="18">
+                <img :src="captchaUrl" v-on:click="apiCaptchaLoad" style="width: 105px; height: 38px; margin-left: 5px;" />
+              </el-col>
+            </el-form-item>
+            
+          </el-form>
+    
+          <el-row style="text-align: center;">
+            <el-divider></el-divider>
+            <div style="height: 10px"></div>
+            <el-button type="primary" size="medium" v-on:click="btnSubmitClick">提 交</el-button>
+            <div style="height: 10px"></div>
+          </el-row>
+        </div>
       </div>
 
     </template>
@@ -93,6 +109,7 @@
         <p>载入中，请稍后...</p>
       </el-row>
     </template>
+
   </div>
 </body>
 

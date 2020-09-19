@@ -20,11 +20,13 @@ namespace SSCMS.Comments.Abstractions
 
         Task DeleteAsync(int commentId);
 
+        Task SetStatusAsync(List<int> commentIds, CommentStatus status);
+
         Task<int> GetCountAsync(int siteId);
 
-        Task<(int Total, List<Comment>)> GetCommentsAsync(int siteId, int contentId, string word, int page, int pageSize);
+        Task<(int Total, List<Comment>)> GetCommentsAsync(int siteId, int channelId, int contentId, CommentStatus status, string keyword, int page, int pageSize);
 
-        Task<List<Comment>> GetCommentsAsync(int siteId, int contentId);
+        Task<List<Comment>> GetCommentsAsync(int siteId, int channelId, int contentId);
 
         string GetValue(TableStyle style, Comment comment);
     }

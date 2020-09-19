@@ -11,10 +11,19 @@ namespace SSCMS.Comments.Models
         public int SiteId { get; set; }
 
         [DataColumn]
+        public int ChannelId { get; set; }
+
+        [DataColumn]
         public int ContentId { get; set; }
 
         [DataColumn]
         public int UserId { get; set; }
+
+        [DataColumn]
+        public string IpAddress { get; set; }
+
+        [DataColumn]
+        public CommentStatus Status { get; set; }
 
         [DataColumn]
         public int ParentId { get; set; }

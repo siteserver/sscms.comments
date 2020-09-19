@@ -9,45 +9,58 @@ var $api = axios.create({
   },
 });
 
-var $url = '/form';
+var $url = '/comments';
 
 var data = utils.init({
-  siteId: utils.getQueryInt('siteId') || $formConfigSiteId,
-  word: utils.getQueryString('word'),
-  pageType: 'loading',
-  styleList: null,
-  allAttributeNames: [],
-  listAttributeNames: [],
-  isReply: false,
+  siteId: utils.getQueryInt('siteId') || $commentsConfigSiteId,
+  channelId: utils.getQueryInt('channelId') || $commentsConfigChannelId,
+  contentId: utils.getQueryInt('contentId') || $commentsConfigContentId,
+  pageType: '',
+  isSubmitDisabled: false,
+  isApprovedByDefault: false,
+  isCaptcha: false,
+  captcha: '',
+  captchaValue: '',
+  captchaUrl: null,
+  form: {},
   total: null,
   pageSize: null,
+  total: null,
   page: 1,
   items: [],
-  columns: null,
+  success: false
 });
 
 var methods = {
   apiGet: function (page) {
     var $this = this;
 
-    this.pageType = 'loading';
-    $api.get($url + '/' + this.siteId, {
-      page: page,
-      word: this.word
+    utils.loading(this, true);
+    $api.get($url, {
+      params: {
+        siteId: this.siteId,
+        channelId: this.channelId,
+        contentId: this.contentId,
+        page: page
+      }
     }).then(function (response) {
       var res = response.data;
 
-      $this.styleList = res.styleList;
-      $this.allAttributeNames = res.allAttributeNames;
-      $this.listAttributeNames = res.listAttributeNames;
-      $this.isReply = res.isReply;
-      $this.items = res.items;
-      $this.total = res.total;
-      $this.pageSize = res.pageSize;
-      $this.columns = res.columns;
+      $this.isSubmitDisabled = res.isSubmitDisabled;
+      $this.isApprovedByDefault = res.isApprovedByDefault;
+      $this.isCaptcha = res.isCaptcha;
+      $this.form = _.assign({
+        siteId: $this.siteId,
+        channelId: $this.channelId,
+        contentId: $this.contentId,
+        captcha: '',
+        content: ''
+      });
+      $this.pageType = 'form';
 
-      $this.pageType = 'list';
-      document.documentElement.scrollTop = document.body.scrollTop = 0;
+      $this.items = res.items;
+      $this.pageSize = res.pageSize || 30;
+      $this.total = res.total;
     }).catch(function (error) {
       utils.error(error);
     }).then(function () {
@@ -55,34 +68,9 @@ var methods = {
     });
   },
 
-  getAttributeText: function (attributeName) {
-    var column = this.columns.find(function (x) {
-      return x.attributeName === attributeName;
-    })
-    return column.displayName;
-  },
-
-  getAttributeType: function(attributeName) {
-    var style = _.find(this.styleList, function(o) {return o.title === attributeName});
-    if (style && style.fieldType) return style.fieldType;
-    return 'Text';
-  },
-
-  getAttributeValue: function (item, attributeName) {
-    return item[_.lowerFirst(attributeName)];
-  },
-
-  largeImage: function(item, attributeName) {
-    var imageUrl = this.getAttributeValue(item, attributeName);
-    Swal.fire({
-      imageUrl: imageUrl,
-      showConfirmButton: false,
-    })
-  },
-
   handleCurrentChange: function(val) {
     this.apiGet(val);
-  },
+  }
 };
 
 var $vue = new Vue({

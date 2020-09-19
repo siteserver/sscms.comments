@@ -20,7 +20,7 @@ namespace SSCMS.Comments.Controllers
             if (request.Page > 0)
             {
                 List<Comment> items;
-                (total, items) = await _commentRepository.GetCommentsAsync(request.SiteId, request.ContentId, null, request.Page, pageSize);
+                (total, items) = await _commentRepository.GetCommentsAsync(request.SiteId, request.ChannelId, request.ContentId, CommentStatus.Approved, null, request.Page, pageSize);
                 list = new List<Comment>();
                 foreach (var item in items)
                 {
@@ -37,8 +37,9 @@ namespace SSCMS.Comments.Controllers
 
             return new GetResult
             {
-                IsClosed = settings.IsClosed,
+                IsSubmitDisabled = settings.IsSubmitDisabled,
                 IsCaptcha = settings.IsCaptcha,
+                IsApprovedByDefault = settings.IsApprovedByDefault,
                 Items = list,
                 Total = total,
                 PageSize = pageSize

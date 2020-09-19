@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
-using SSCMS.Comments.Abstractions;
 using SSCMS.Parse;
 using SSCMS.Plugins;
 using SSCMS.Services;
@@ -13,12 +12,10 @@ namespace SSCMS.Comments.Core
         private const string AttributeType = "type";
 
         private readonly IPathManager _pathManager;
-        private readonly ISettingsRepository _settingsRepository;
 
-        public StlComments(IPathManager pathManager, ISettingsRepository formRepository)
+        public StlComments(IPathManager pathManager)
         {
             _pathManager = pathManager;
-            _settingsRepository = formRepository;
         }
 
         public string ElementName => "stl:comments";
@@ -42,7 +39,7 @@ namespace SSCMS.Comments.Core
             {
                 var elementId = $"iframe_{StringUtils.GetShortGuid(false)}";
                 var libUrl = _pathManager.GetRootUrl("assets/comments/lib/iframe-resizer-3.6.3/iframeResizer.min.js");
-                var pageUrl = _pathManager.GetRootUrl($"assets/comments/templates/{type}/index.html?siteId={context.SiteId}&contentId={context.ContentId}&apiUrl={HttpUtility.UrlEncode(apiUrl)}");
+                var pageUrl = _pathManager.GetRootUrl($"assets/comments/templates/{type}/index.html?siteId={context.SiteId}&channelId={context.ChannelId}&contentId={context.ContentId}&apiUrl={HttpUtility.UrlEncode(apiUrl)}");
 
                 return $@"
 <iframe id=""{elementId}"" frameborder=""0"" scrolling=""no"" src=""{pageUrl}"" style=""width: 1px;min-width: 100%;""></iframe>
@@ -53,9 +50,10 @@ namespace SSCMS.Comments.Core
 
             return $@"
 <script>
-var $formConfigApiUrl = '{apiUrl}';
-var $formConfigSiteId = {context.SiteId};
-var $formConfigContentId = {context.ContentId};
+var $commentsConfigApiUrl = '{apiUrl}';
+var $commentsConfigSiteId = {context.SiteId};
+var $commentsConfigChannelId = {context.ChannelId};
+var $commentsConfigContentId = {context.ContentId};
 </script>
 {context.StlInnerHtml}
 ";

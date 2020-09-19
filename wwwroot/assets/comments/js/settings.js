@@ -3,7 +3,6 @@ var $url = '/comments/settings';
 var data = utils.init({
   siteId: utils.getQueryInt('siteId'),
   settings: null,
-  styleList: [],
   attributeNames: null,
   administratorSmsNotifyKeys: null,
   userSmsNotifyKeys: null
@@ -25,7 +24,6 @@ var methods = {
       if ($this.settings.pageSize === 0) {
         $this.settings.pageSize = 30;
       }
-      $this.styleList = res.styleList;
       $this.attributeNames = res.attributeNames;
       $this.administratorSmsNotifyKeys = res.administratorSmsNotifyKeys;
       $this.userSmsNotifyKeys = res.userSmsNotifyKeys;

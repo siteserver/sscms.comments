@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SSCMS.Comments.Core;
-using SSCMS.Comments.Models;
-using SSCMS.Models;
 
 namespace SSCMS.Comments.Controllers.Admin
 {
@@ -16,29 +13,14 @@ namespace SSCMS.Comments.Controllers.Admin
                 return Unauthorized();
 
             var settings = await _commentManager.GetSettingsAsync(request.SiteId);
-
-            var pageSize = settings.PageSize;
-
-            var (total, items) = await _commentRepository.GetCommentsAsync(request.SiteId, request.ContentId, null, request.Page, pageSize);
-
-            var list = new List<Comment>();
-            foreach (var item in items)
-            {
-                var comment = item.Clone<Comment>();
-                var user = new User();
-                if (comment.UserId > 0)
-                {
-                    user = await _userRepository.GetByUserIdAsync(comment.UserId);
-                }
-                comment.Set("user", user);
-                list.Add(comment);
-            }
+            var site = await _sitetRepository.GetAsync(request.SiteId);
+            var (total, items) = await GetCommentsAsync(settings, site, request.ChannelId, request.ContentId, request.Status, request.Keyword, request.Page);
 
             return new GetResult
             {
-                Items = list,
+                Items = items,
                 Total = total,
-                PageSize = pageSize
+                PageSize = settings.PageSize
             };
         }
     }

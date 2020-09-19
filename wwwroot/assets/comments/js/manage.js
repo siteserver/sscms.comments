@@ -1,14 +1,19 @@
 ﻿var $url = '/comments/manage';
 var $urlActionsExport = '/comments/manage/actions/export';
+var $urlActionsSetStatus = '/comments/manage/actions/setStatus';
 
 var data = utils.init({
   siteId: utils.getQueryInt('siteId'),
+  channelId: utils.getQueryInt('channelId'),
   contentId: utils.getQueryInt('contentId'),
+  status: 'All',
+  keyword: '',
   total: null,
   pageSize: null,
   total: null,
   page: 1,
-  items: []
+  items: [],
+  multipleSelection: [],
 });
 
 var methods = {
@@ -19,7 +24,10 @@ var methods = {
     $api.get($url, {
       params: {
         siteId: this.siteId,
+        channelId: this.channelId,
         contentId: this.contentId,
+        status: this.status,
+        keyword: this.keyword,
         page: page
       }
     }).then(function (response) {
@@ -35,21 +43,25 @@ var methods = {
     });
   },
 
-  apiDelete: function (commentId) {
+  apiDelete: function (comment) {
     var $this = this;
 
     utils.loading(true);
     $api.delete($url, {
       data: {
         siteId: this.siteId,
+        channelId: this.channelId,
         contentId: this.contentId,
-        commentId: commentId
+        status: this.status,
+        keyword: this.keyword,
+        commentId: comment.id
       }
     }).then(function (response) {
       var res = response.data;
 
       $this.items = res.items;
       $this.total = res.total;
+      utils.success('评论删除成功！');
     }).catch(function (error) {
       utils.error(error);
     }).then(function () {
@@ -57,19 +69,89 @@ var methods = {
     });
   },
 
+  apiSetStatus: function (status) {
+    var $this = this;
+
+    utils.loading(true);
+    $api.post($urlActionsSetStatus, {
+      siteId: this.siteId,
+      channelId: this.channelId,
+      contentId: this.contentId,
+      status: this.status,
+      keyword: this.keyword,
+      commentIds: this.commentIds,
+      commentStatus: status
+    }).then(function (response) {
+      var res = response.data;
+
+      $this.items = res.items;
+      $this.total = res.total;
+      utils.success('评论状态设置成功！');
+    }).catch(function (error) {
+      utils.error(error);
+    }).then(function () {
+      utils.loading($this, false);
+    });
+  },
+
+  tableRowClassName: function(scope) {
+    if (this.multipleSelection.indexOf(scope.row) !== -1) {
+      return 'current-row';
+    }
+    return '';
+  },
+
+  handleSelectionChange: function(val) {
+    this.multipleSelection = val;
+  },
+
+  toggleSelection: function(row) {
+    this.$refs.multipleTable.toggleRowSelection(row);
+  },
+
+  btnSearchClick: function() {
+    this.apiGet(1);
+  },
+
   handleCurrentChange: function(val) {
     this.apiGet(val);
   },
 
-  btnEditClick: function (commentId) {
+  btnStatusClick: function(status) {
+    if (!this.isCommentChecked) return;
+    this.apiSetStatus(status);
+  },
+
+  getContentUrl: function (comment) {
+    return utils.getRootUrl('redirect', {
+      siteId: comment.siteId,
+      channelId: comment.channelId,
+      contentId: comment.contentId
+    });
+  },
+
+  getStatus: function(status) {
+    if (status === 'Approved') return '已审核';
+    else if (status === 'Spam') return '垃圾信息';
+    else return '待审核';
+  },
+
+  getStatusType: function(status) {
+    if (status === 'Approved') return 'primary';
+    else if (status === 'Spam') return 'warning';
+    else return 'danger';
+  },
+
+  btnEditClick: function (comment) {
     utils.openLayer({
       title: '编辑评论',
       width: 550,
       height: 300,
       url: utils.getRootUrl('comments/manageLayerEdit', {
         siteId: this.siteId,
-        contentId: this.contentId,
-        commentId: commentId
+        channelId: comment.channelId,
+        contentId: comment.contentId,
+        commentId: comment.id
       })
     });
   },
@@ -83,14 +165,14 @@ var methods = {
     });
   },
 
-  btnDeleteClick: function (commentId) {
+  btnDeleteClick: function (comment) {
     var $this = this;
 
     utils.alertDelete({
       title: '删除评论',
       text: '此操作将删除评论，确定吗？',
       callback: function () {
-        $this.apiDelete(commentId);
+        $this.apiDelete(comment);
       }
     });
   },
@@ -101,6 +183,7 @@ var methods = {
 
     $api.post($urlActionsExport, {
       siteId: this.siteId,
+      channelId: this.channelId,
       contentId: this.contentId,
     }).then(function (response) {
       var res = response.data;
@@ -120,6 +203,20 @@ var $vue = new Vue({
   el: '#main',
   data: data,
   methods: methods,
+  computed: {
+    isCommentChecked: function() {
+      return this.multipleSelection.length > 0;
+    },
+
+    commentIds: function() {
+      var retVal = [];
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        var comment = this.multipleSelection[i];
+        retVal.push(comment.id);
+      }
+      return retVal;
+    }
+  },
   created: function () {
     this.apiGet(1);
   }
