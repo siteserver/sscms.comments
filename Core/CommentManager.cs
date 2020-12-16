@@ -17,14 +17,14 @@ namespace SSCMS.Comments.Core
         public const string PermissionsSettings = "comments_settings";
         public const string PermissionsTemplates = "comments_templates";
 
-        private readonly ICacheManager<string> _cacheManager;
+        private readonly ICacheManager _cacheManager;
         private readonly IPathManager _pathManager;
         private readonly IPluginManager _pluginManager;
         private readonly ISettingsRepository _settingsRepository;
         private readonly ITableStyleRepository _tableStyleRepository;
         private readonly ICommentRepository _commentRepository;
 
-        public CommentManager(ICacheManager<string> cacheManager, IPathManager pathManager, IPluginManager pluginManager, ISettingsRepository settingsRepository, ITableStyleRepository tableStyleRepository, ICommentRepository commentRepository)
+        public CommentManager(ICacheManager cacheManager, IPathManager pathManager, IPluginManager pluginManager, ISettingsRepository settingsRepository, ITableStyleRepository tableStyleRepository, ICommentRepository commentRepository)
         {
             _cacheManager = cacheManager;
             _pathManager = pathManager;
@@ -78,7 +78,7 @@ namespace SSCMS.Comments.Core
         {
             var directoryPath = GetMailTemplatesDirectoryPath();
             var htmlPath = PathUtils.Combine(directoryPath, "template.html");
-            if (_cacheManager.Exists(htmlPath)) return _cacheManager.Get(htmlPath);
+            if (_cacheManager.Exists(htmlPath)) return _cacheManager.Get<string>(htmlPath);
 
             var html = await FileUtils.ReadTextAsync(htmlPath);
 
@@ -90,7 +90,7 @@ namespace SSCMS.Comments.Core
         {
             var directoryPath = GetMailTemplatesDirectoryPath();
             var htmlPath = PathUtils.Combine(directoryPath, "list.html");
-            if (_cacheManager.Exists(htmlPath)) return _cacheManager.Get(htmlPath);
+            if (_cacheManager.Exists(htmlPath)) return _cacheManager.Get<string>(htmlPath);
 
             var html = await FileUtils.ReadTextAsync(htmlPath);
 
@@ -295,11 +295,11 @@ namespace SSCMS.Comments.Core
             FileUtils.WriteText(configPath, configJson);
         }
 
-        public async Task<string> GetTemplateHtmlAsync(TemplateInfo templateInfo)
+        public string GetTemplateHtml(TemplateInfo templateInfo)
         {
             var directoryPath = GetTemplatesDirectoryPath();
             var htmlPath = PathUtils.Combine(directoryPath, templateInfo.Name, templateInfo.Main);
-            return await _pathManager.GetContentByFilePathAsync(htmlPath);
+            return _pathManager.GetContentByFilePath(htmlPath);
         }
 
         public void SetTemplateHtml(TemplateInfo templateInfo, string html)

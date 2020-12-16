@@ -14,7 +14,7 @@ namespace SSCMS.Comments.Controllers.Admin
                 return Unauthorized();
 
             var templateInfo = _commentManager.GetTemplateInfo(request.Name);
-            var html = await _commentManager.GetTemplateHtmlAsync(templateInfo);
+            var html = _commentManager.GetTemplateHtml(templateInfo);
 
             var isSystem = templateInfo.Publisher == "sscms";
             if (isSystem)

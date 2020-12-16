@@ -59,9 +59,18 @@ namespace SSCMS.Comments.Core
             );
         }
 
-        public async Task<int> GetCountAsync(int siteId)
+        public async Task<int> GetCountAsync(int siteId, int channelId, int contentId)
         {
-            return await _repository.CountAsync(Q.Where(nameof(Comment.SiteId), siteId));
+            var query = Q.Where(nameof(Comment.SiteId), siteId);
+            if (channelId > 0)
+            {
+                query.Where(nameof(Comment.ChannelId), channelId);
+            }
+            if (contentId > 0)
+            {
+                query.Where(nameof(Comment.ContentId), contentId);
+            }
+            return await _repository.CountAsync(query);
         }
 
         public async Task<(int Total, List<Comment>)> GetCommentsAsync(int siteId, int channelId, int contentId, CommentStatus status, string keyword, int page, int pageSize)

@@ -24,7 +24,7 @@ namespace SSCMS.Comments.Abstractions
 
         void Edit(TemplateInfo templateInfo);
 
-        Task<string> GetTemplateHtmlAsync(TemplateInfo templateInfo);
+        string GetTemplateHtml(TemplateInfo templateInfo);
 
         void SetTemplateHtml(TemplateInfo templateInfo, string html);
 

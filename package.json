@@ -2,17 +2,18 @@
   "name": "comments",
   "displayName": "评论插件",
   "description": "SSCMS 评论插件用于在页面中提交及显示评论",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "license": "GPL-3.0",
   "publisher": "sscms",
   "engines": {
-    "sscms": "^7.0.0"
+    "sscms": "^7.0.5"
   },
   "categories": [
     "Other"
   ],
   "keywords": [
-    "内容"
+    "评论",
+    "内容评论"
   ],
   "repository": {
     "type": "git",
@@ -83,6 +84,15 @@
       "comments_contents_all": {
         "text": "评论",
         "type": ["content"],
+        "link": "/ss-admin/comments/manage/",
+        "permissions": [
+          "comments_manage"
+        ],
+        "order": 1
+      },
+      "comments_channels_all": {
+        "text": "评论",
+        "type": ["channel"],
         "link": "/ss-admin/comments/manage/",
         "permissions": [
           "comments_manage"

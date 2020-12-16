@@ -45,6 +45,12 @@ namespace SSCMS.Comments.Controllers
                 }
             }
 
+            if (_authManager.IsUser)
+            {
+                var user = await _authManager.GetUserAsync();
+                await _logRepository.AddUserLogAsync(user, "发表评论");
+            }
+
             return new SubmitResult
             {
                 Items = list,

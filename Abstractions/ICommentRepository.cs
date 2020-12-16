@@ -22,7 +22,7 @@ namespace SSCMS.Comments.Abstractions
 
         Task SetStatusAsync(List<int> commentIds, CommentStatus status);
 
-        Task<int> GetCountAsync(int siteId);
+        Task<int> GetCountAsync(int siteId, int channelId, int contentId);
 
         Task<(int Total, List<Comment>)> GetCommentsAsync(int siteId, int channelId, int contentId, CommentStatus status, string keyword, int page, int pageSize);
 
