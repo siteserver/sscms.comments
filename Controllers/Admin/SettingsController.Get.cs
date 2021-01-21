@@ -18,11 +18,16 @@ namespace SSCMS.Comments.Controllers.Admin
             var administratorSmsNotifyKeys = ListUtils.GetStringList(settings.AdministratorSmsNotifyKeys);
             var userSmsNotifyKeys = ListUtils.GetStringList(settings.UserSmsNotifyKeys);
 
+            var isSmsEnabled = await _smsManager.IsEnabledAsync();
+            var isMailEnabled = await _mailManager.IsEnabledAsync();
+
             return new GetResult
             {
                 Settings = settings,
                 AdministratorSmsNotifyKeys = administratorSmsNotifyKeys,
-                UserSmsNotifyKeys = userSmsNotifyKeys
+                UserSmsNotifyKeys = userSmsNotifyKeys,
+                IsSmsEnabled = isSmsEnabled,
+                IsMailEnabled = isMailEnabled
             };
         }
     }

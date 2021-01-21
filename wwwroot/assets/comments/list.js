@@ -1,4 +1,4 @@
-$apiUrl = utils.getQueryString('apiUrl') || $formConfigApiUrl;
+$apiUrl = utils.getQueryString('apiUrl') || window.$formConfigApiUrl || '/api';
 $rootUrl = "/";
 $token = localStorage.getItem(ACCESS_TOKEN_NAME);
 
@@ -12,9 +12,9 @@ var $api = axios.create({
 var $url = '/comments';
 
 var data = utils.init({
-  siteId: utils.getQueryInt('siteId') || $commentsConfigSiteId,
-  channelId: utils.getQueryInt('channelId') || $commentsConfigChannelId,
-  contentId: utils.getQueryInt('contentId') || $commentsConfigContentId,
+  siteId: utils.getQueryInt('siteId') || window.$commentsConfigSiteId || 0,
+  channelId: utils.getQueryInt('channelId') || window.$commentsConfigChannelId || 0,
+  contentId: utils.getQueryInt('contentId') || window.$commentsConfigContentId || 0,
   pageType: '',
   isSubmitDisabled: false,
   isApprovedByDefault: false,

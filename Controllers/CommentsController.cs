@@ -14,14 +14,16 @@ namespace SSCMS.Comments.Controllers
         private readonly IAuthManager _authManager;
         private readonly IUserRepository _userRepository;
         private readonly ILogRepository _logRepository;
+        private readonly ISiteRepository _sitetRepository;
         private readonly ICommentManager _commentManager;
         private readonly ICommentRepository _commentRepository;
 
-        public CommentsController(IAuthManager authManager, IUserRepository userRepository, ILogRepository logRepository, ICommentManager commentManager, ICommentRepository commentRepository)
+        public CommentsController(IAuthManager authManager, IUserRepository userRepository, ILogRepository logRepository, ISiteRepository sitetRepository, ICommentManager commentManager, ICommentRepository commentRepository)
         {
             _authManager = authManager;
             _userRepository = userRepository;
             _logRepository = logRepository;
+            _sitetRepository = sitetRepository;
             _commentManager = commentManager;
             _commentRepository = commentRepository;
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SSCMS.Comments.Models;
+using SSCMS.Models;
 
 namespace SSCMS.Comments.Abstractions
 {
@@ -14,7 +15,7 @@ namespace SSCMS.Comments.Abstractions
 
         Task<string> GetMailListHtmlAsync();
 
-        void SendNotify(Comment comment);
+        Task SendNotifyAsync(Site site, Settings settings, Comment comment);
 
         List<TemplateInfo> GetTemplateInfoList();
 

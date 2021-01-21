@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
 using SSCMS.Comments.Abstractions;
+using SSCMS.Configuration;
 using SSCMS.Parse;
 using SSCMS.Plugins;
 using SSCMS.Repositories;
@@ -19,12 +20,14 @@ namespace SSCMS.Comments.Core
         private const string TypeCount = "count";
 
         private readonly IPathManager _pathManager;
+        private readonly ISiteRepository _siteRepository;
         private readonly IChannelRepository _channelRepository;
         private readonly ICommentRepository _commentRepository;
 
-        public StlComments(IPathManager pathManager, IChannelRepository channelRepository, ICommentRepository commentRepository)
+        public StlComments(IPathManager pathManager, ISiteRepository siteRepository, IChannelRepository channelRepository, ICommentRepository commentRepository)
         {
             _pathManager = pathManager;
+            _siteRepository = siteRepository;
             _channelRepository = channelRepository;
             _commentRepository = commentRepository;
         }
@@ -60,6 +63,11 @@ namespace SSCMS.Comments.Core
                 }
             }
 
+            if (string.IsNullOrEmpty(theme))
+            {
+                theme = "all";
+            }
+
             var channelId = context.ChannelId;
             var contentId = context.ContentId;
             if (!string.IsNullOrEmpty(channelIndex) || !string.IsNullOrEmpty(channelName))
@@ -74,12 +82,13 @@ namespace SSCMS.Comments.Core
                 return count.ToString();
             }
 
-            var apiUrl = _pathManager.GetApiUrl();
+            var site = await _siteRepository.GetAsync(context.SiteId);
+            var apiUrl = _pathManager.GetApiHostUrl(site, Constants.ApiPrefix);
             if (string.IsNullOrEmpty(context.StlInnerHtml))
             {
                 var elementId = $"iframe_{StringUtils.GetShortGuid(false)}";
-                var libUrl = _pathManager.GetRootUrl("assets/comments/lib/iframe-resizer-3.6.3/iframeResizer.min.js");
-                var pageUrl = _pathManager.GetRootUrl($"assets/comments/templates/{theme}/index.html?siteId={context.SiteId}&channelId={context.ChannelId}&contentId={context.ContentId}&apiUrl={HttpUtility.UrlEncode(apiUrl)}");
+                var libUrl = _pathManager.GetApiHostUrl(site, "assets/comments/lib/iframe-resizer-3.6.3/iframeResizer.min.js");
+                var pageUrl = _pathManager.GetApiHostUrl(site, $"assets/comments/templates/{theme}/index.html?siteId={context.SiteId}&channelId={context.ChannelId}&contentId={context.ContentId}&apiUrl={HttpUtility.UrlEncode(apiUrl)}");
 
                 return $@"
 <iframe id=""{elementId}"" frameborder=""0"" scrolling=""no"" src=""{pageUrl}"" style=""width: 1px;min-width: 100%;""></iframe>

@@ -15,7 +15,6 @@ namespace SSCMS.Comments.Core
     public class CommentRepository : ICommentRepository
     {
         private readonly Repository<Comment> _repository;
-        private const string ExtendValues = "ExtendValues";
 
         public CommentRepository(ISettingsManager settingsManager)
         {
@@ -79,8 +78,7 @@ namespace SSCMS.Comments.Core
 
             var q = Q
                 .Where(nameof(Comment.SiteId), siteId)
-                .OrderByDesc(nameof(Comment.Id))
-                .ForPage(page, pageSize);
+                .OrderByDesc(nameof(Comment.Id));
 
             if (channelId > 0)
             {
@@ -106,7 +104,7 @@ namespace SSCMS.Comments.Core
             }
 
             var count = await _repository.CountAsync(q);
-            var list = await _repository.GetAllAsync(q);
+            var list = await _repository.GetAllAsync(q.ForPage(page, pageSize));
 
             return (count, list);
         }

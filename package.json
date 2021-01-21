@@ -2,11 +2,11 @@
   "name": "comments",
   "displayName": "评论插件",
   "description": "SSCMS 评论插件用于在页面中提交及显示评论",
-  "version": "1.0.3",
-  "license": "GPL-3.0",
+  "version": "1.0.6",
+  "license": "AGPL-3.0",
   "publisher": "sscms",
   "engines": {
-    "sscms": "^7.0.5"
+    "sscms": "^7.0.9"
   },
   "categories": [
     "Other"
@@ -45,8 +45,8 @@
     },
     "menus": {
       "comments_site_all": {
-        "text": "评论管理",
-        "iconClass": "ion-android-list",
+        "text": "评论",
+        "iconClass": "ion-chatbubble-working",
         "type": ["web", "wx"],
         "permissions": [
           "comments_manage",

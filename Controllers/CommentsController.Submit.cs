@@ -12,6 +12,7 @@ namespace SSCMS.Comments.Controllers
         [HttpPost, Route("")]
         public async Task<ActionResult<SubmitResult>> Submit([FromBody] Comment request)
         {
+            var site = await _sitetRepository.GetAsync(request.SiteId);
             var settings = await _commentManager.GetSettingsAsync(request.SiteId);
             if (settings.IsSubmitDisabled)
             {
@@ -23,7 +24,7 @@ namespace SSCMS.Comments.Controllers
             request.IpAddress = PageUtils.GetIpAddress(Request);
 
             request.Id = await _commentRepository.InsertAsync(request);
-            _commentManager.SendNotify(request);
+            await _commentManager.SendNotifyAsync(site, settings, request);
 
             List<Comment> list = null;
             var total = 0;
@@ -48,7 +49,7 @@ namespace SSCMS.Comments.Controllers
             if (_authManager.IsUser)
             {
                 var user = await _authManager.GetUserAsync();
-                await _logRepository.AddUserLogAsync(user, "发表评论");
+                await _logRepository.AddUserLogAsync(user, PageUtils.GetIpAddress(Request), "发表评论");
             }
 
             return new SubmitResult
