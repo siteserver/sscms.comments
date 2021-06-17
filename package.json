@@ -6,7 +6,7 @@
   "license": "AGPL-3.0",
   "publisher": "sscms",
   "engines": {
-    "sscms": "^7.0.9"
+    "sscms": "^7.0.12"
   },
   "categories": [
     "Other"
