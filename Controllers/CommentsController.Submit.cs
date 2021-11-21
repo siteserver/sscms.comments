@@ -12,7 +12,7 @@ namespace SSCMS.Comments.Controllers
         [HttpPost, Route("")]
         public async Task<ActionResult<SubmitResult>> Submit([FromBody] Comment request)
         {
-            var site = await _sitetRepository.GetAsync(request.SiteId);
+            var site = await _siteRepository.GetAsync(request.SiteId);
             var settings = await _commentManager.GetSettingsAsync(request.SiteId);
             if (settings.IsSubmitDisabled)
             {

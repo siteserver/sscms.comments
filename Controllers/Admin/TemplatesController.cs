@@ -14,6 +14,7 @@ namespace SSCMS.Comments.Controllers.Admin
     public partial class TemplatesController : ControllerBase
     {
         private const string Route = "comments/templates";
+        private const string RouteDelete = "comments/templates/actions/delete";
 
         private readonly IAuthManager _authManager;
         private readonly ICommentManager _commentManager;

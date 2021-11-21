@@ -17,8 +17,9 @@ namespace SSCMS.Comments.Controllers.Admin
     public partial class ManageController : ControllerBase
     {
         private const string Route = "comments/manage";
-        private const string ActionsExport = "comments/manage/actions/export";
-        private const string ActionsSetStatus = "comments/manage/actions/setStatus";
+        private const string RouteExport = "comments/manage/actions/export";
+        private const string RouteSetStatus = "comments/manage/actions/setStatus";
+        private const string RouteDelete = "comments/manage/actions/delete";
 
         private readonly IAuthManager _authManager;
         private readonly IPathManager _pathManager;

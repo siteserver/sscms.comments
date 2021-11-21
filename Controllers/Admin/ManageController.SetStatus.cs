@@ -6,7 +6,7 @@ namespace SSCMS.Comments.Controllers.Admin
 {
     public partial class ManageController
     {
-        [HttpPost, Route(ActionsSetStatus)]
+        [HttpPost, Route(RouteSetStatus)]
         public async Task<ActionResult<SetStatusResult>> SetStatus([FromBody] SetStatusRequest request)
         {
             if (!await _authManager.HasSitePermissionsAsync(request.SiteId, CommentManager.PermissionsManage))

@@ -1,6 +1,7 @@
 ﻿var $url = '/comments/manage';
-var $urlActionsExport = '/comments/manage/actions/export';
-var $urlActionsSetStatus = '/comments/manage/actions/setStatus';
+var $urlExport = $url + '/actions/export';
+var $urlSetStatus = $url + '/actions/setStatus';
+var $urlDelete = $url + '/actions/delete';
 
 var data = utils.init({
   siteId: utils.getQueryInt('siteId'),
@@ -47,15 +48,13 @@ var methods = {
     var $this = this;
 
     utils.loading(true);
-    $api.delete($url, {
-      data: {
-        siteId: this.siteId,
-        channelId: this.channelId,
-        contentId: this.contentId,
-        status: this.status,
-        keyword: this.keyword,
-        commentId: comment.id
-      }
+    $api.post($urlDelete, {
+      siteId: this.siteId,
+      channelId: this.channelId,
+      contentId: this.contentId,
+      status: this.status,
+      keyword: this.keyword,
+      commentId: comment.id
     }).then(function (response) {
       var res = response.data;
 
@@ -73,7 +72,7 @@ var methods = {
     var $this = this;
 
     utils.loading(true);
-    $api.post($urlActionsSetStatus, {
+    $api.post($urlSetStatus, {
       siteId: this.siteId,
       channelId: this.channelId,
       contentId: this.contentId,
@@ -158,7 +157,7 @@ var methods = {
 
   btnViewClick: function(userId) {
     if (userId === 0) return;
-    
+
     utils.openLayer({
       title: '查看资料',
       url: utils.getCommonUrl('userLayerView', {userId: userId})
@@ -181,7 +180,7 @@ var methods = {
     var $this = this;
     utils.loading(true);
 
-    $api.post($urlActionsExport, {
+    $api.post($urlExport, {
       siteId: this.siteId,
       channelId: this.channelId,
       contentId: this.contentId,

@@ -13,6 +13,7 @@ namespace SSCMS.Comments.Controllers.Admin
     public partial class TemplatesLayerEditController : ControllerBase
     {
         private const string Route = "comments/templatesLayerEdit";
+        private const string RouteUpdate = "comments/templatesLayerEdit/actions/update";
 
         private readonly IAuthManager _authManager;
         private readonly ICommentManager _commentManager;
@@ -41,7 +42,7 @@ namespace SSCMS.Comments.Controllers.Admin
             public string TemplateHtml { get; set; }
         }
 
-        public class EditRequest : SiteRequest
+        public class UpdateRequest : SiteRequest
         {
             public string OriginalName { get; set; }
             public string Name { get; set; }

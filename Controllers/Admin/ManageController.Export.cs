@@ -9,7 +9,7 @@ namespace SSCMS.Comments.Controllers.Admin
 {
     public partial class ManageController
     {
-        [HttpPost, Route(ActionsExport)]
+        [HttpPost, Route(RouteExport)]
         public async Task<ActionResult<StringResult>> Export([FromBody] CommentRequest request)
         {
             if (!await _authManager.HasSitePermissionsAsync(request.SiteId, CommentManager.PermissionsManage))

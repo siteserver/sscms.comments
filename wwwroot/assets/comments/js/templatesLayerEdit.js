@@ -1,4 +1,5 @@
 ﻿var $url = '/comments/templatesLayerEdit';
+var $urlUpdate = $url + '/actions/update';
 
 var data = utils.init({
   siteId: utils.getQueryInt('siteId'),
@@ -55,7 +56,7 @@ var methods = {
     var $this = this;
 
     utils.loading(this, true);
-    $api.put($url, {
+    $api.post($urlUpdate, {
       type: this.type,
       originalName: this.name,
       name: this.templateInfo.name,
@@ -73,7 +74,7 @@ var methods = {
 
   btnSubmitClick: function () {
     var $this = this;
-    
+
     this.$refs.form.validate(function(valid) {
       if (valid) {
         if ($this.isSystem) {
