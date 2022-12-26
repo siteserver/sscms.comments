@@ -112,7 +112,7 @@ namespace SSCMS.Comments.Core
                 !string.IsNullOrEmpty(settings.AdministratorSmsNotifyTplId) &&
                 !string.IsNullOrEmpty(settings.AdministratorSmsNotifyMobile))
             {
-                var isSmsEnabled = await _smsManager.IsEnabledAsync();
+                var isSmsEnabled = await _smsManager.IsSmsEnabledAsync();
                 if (isSmsEnabled)
                 {
                     var parameters = new Dictionary<string, string>();
@@ -140,7 +140,7 @@ namespace SSCMS.Comments.Core
                         }
                     }
 
-                    await _smsManager.SendAsync(settings.AdministratorSmsNotifyMobile,
+                    await _smsManager.SendSmsAsync(settings.AdministratorSmsNotifyMobile,
                         settings.AdministratorSmsNotifyTplId, parameters);
                 }
             }
@@ -148,7 +148,7 @@ namespace SSCMS.Comments.Core
             if (settings.IsAdministratorMailNotify &&
                 !string.IsNullOrEmpty(settings.AdministratorMailNotifyAddress))
             {
-                var isMailEnabled = await _mailManager.IsEnabledAsync();
+                var isMailEnabled = await _mailManager.IsMailEnabledAsync();
                 if (isMailEnabled)
                 {
                     var templateHtml = await GetMailTemplateHtmlAsync();
@@ -180,7 +180,7 @@ namespace SSCMS.Comments.Core
                         .Replace("{{title}}", title)
                         .Replace("{{list}}", list.ToString());
 
-                    await _mailManager.SendAsync(settings.AdministratorMailNotifyAddress, "[SSCMS] 通知邮件",
+                    await _mailManager.SendMailAsync(settings.AdministratorMailNotifyAddress, "[SSCMS] 通知邮件",
                         htmlBody);
                 }
             }
@@ -189,7 +189,7 @@ namespace SSCMS.Comments.Core
                 !string.IsNullOrEmpty(settings.UserSmsNotifyTplId) &&
                 !string.IsNullOrEmpty(settings.UserSmsNotifyMobileName))
             {
-                var isSmsEnabled = await _smsManager.IsEnabledAsync();
+                var isSmsEnabled = await _smsManager.IsSmsEnabledAsync();
                 if (isSmsEnabled)
                 {
                     var parameters = new Dictionary<string, string>();
@@ -220,7 +220,7 @@ namespace SSCMS.Comments.Core
                     var mobile = comment.Get<string>(settings.UserSmsNotifyMobileName);
                     if (!string.IsNullOrEmpty(mobile))
                     {
-                        await _smsManager.SendAsync(mobile, settings.UserSmsNotifyTplId, parameters);
+                        await _smsManager.SendSmsAsync(mobile, settings.UserSmsNotifyTplId, parameters);
                     }
                 }
             }

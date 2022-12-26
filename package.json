@@ -2,11 +2,11 @@
   "name": "comments",
   "displayName": "评论插件",
   "description": "SSCMS 评论插件用于在页面中提交及显示评论",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "license": "AGPL-3.0",
   "publisher": "sscms",
   "engines": {
-    "sscms": "^7.1.0"
+    "sscms": "^7.2.0"
   },
   "categories": [
     "Other"
